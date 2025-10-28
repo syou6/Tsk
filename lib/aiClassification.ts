@@ -81,7 +81,7 @@ function generateReasoning(quadrant: Quadrant, scores: Record<Quadrant, number>,
   const maxScore = scores[quadrant];
   
   if (maxScore === 0) {
-    return `「${title}」は明確な分類キーワードが見つからないため、D象限（${config.description}）に分類しました。`;
+    return `「${title}」は明確な分類キーワードが見つからないため、D象限（影響が小さいタスク・バックログ）に分類しました。`;
   }
   
   const matchedKeywords = Object.entries(classificationKeywords[quadrant].keywords)
