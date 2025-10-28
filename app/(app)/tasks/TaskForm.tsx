@@ -28,7 +28,7 @@ export function TaskForm() {
     const classification = classifyTask(title);
     setAiResult(classification);
     
-    // 自動的にフラグを設定
+    // 自動的にフラグを設定（AI分類結果に基づく）
     const urgentValue = classification.quadrant === "A" || classification.quadrant === "C";
     const importantValue = classification.quadrant === "A" || classification.quadrant === "B";
     
