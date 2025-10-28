@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AIClassificationForm } from "./AIClassificationForm";
+import { createTask } from "./actions";
 
 export function TaskForm() {
   const [urgent, setUrgent] = useState(false);
@@ -20,7 +21,7 @@ export function TaskForm() {
         <AIClassificationForm onClassification={handleAIClassification} />
       </div>
 
-      <form action="/tasks" method="POST" className="grid gap-4 md:grid-cols-[1fr,180px]">
+      <form action={createTask} className="grid gap-4 md:grid-cols-[1fr,180px]">
         <div className="space-y-2">
           <label htmlFor="title" className="text-base font-semibold text-muted-foreground md:text-lg">
             タスク名
