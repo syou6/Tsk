@@ -78,10 +78,10 @@ export default function SignupPage() {
       <Header />
       <main className="flex flex-1 items-center justify-center px-6 py-16">
         <div className="w-full max-w-md space-y-8 rounded-2xl border border-border bg-background p-8 shadow-sm">
-          <div className="space-y-2 text-center">
-            <h1 className="text-2xl font-semibold text-foreground">新規登録</h1>
-            <p className="text-sm text-muted-foreground">
-              メールアドレスとパスワードを設定してください。確認メールが送信されます。
+          <div className="space-y-3 text-center">
+            <h1 className="text-4xl font-bold text-foreground">新規登録</h1>
+            <p className="text-lg text-muted-foreground">
+              インディハッカー向けのタスク管理ツールで、プロジェクトを効率的に管理しましょう
             </p>
           </div>
 
@@ -126,16 +126,16 @@ export default function SignupPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={loading || !ready}>
+              <Button type="submit" className="w-full text-lg py-3" disabled={loading || !ready}>
                 {loading ? "登録中..." : "アカウントを作成"}
               </Button>
               {error ? <p className="text-sm text-destructive">{error}</p> : null}
             </form>
           </Form>
 
-          <p className="text-center text-xs text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground">
             すでにアカウントをお持ちですか？
-            <Link href="/auth/login" className="ml-1 underline">
+            <Link href="/auth/login" className="ml-1 underline font-medium">
               ログイン
             </Link>
           </p>

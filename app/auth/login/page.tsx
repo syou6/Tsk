@@ -71,10 +71,10 @@ export default function LoginPage() {
       <Header />
       <main className="flex flex-1 items-center justify-center px-6 py-16">
         <div className="w-full max-w-md space-y-8 rounded-2xl border border-border bg-background p-8 shadow-sm">
-          <div className="space-y-2 text-center">
-            <h1 className="text-2xl font-semibold text-foreground">ログイン</h1>
-            <p className="text-sm text-muted-foreground">
-              登録済みのメールアドレスとパスワードでサインインしてください。
+          <div className="space-y-3 text-center">
+            <h1 className="text-4xl font-bold text-foreground">ログイン</h1>
+            <p className="text-lg text-muted-foreground">
+              インディハッカーの生産性を最大化するタスク管理ツールへようこそ
             </p>
           </div>
 
@@ -106,16 +106,16 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={loading || !ready}>
+              <Button type="submit" className="w-full text-lg py-3" disabled={loading || !ready}>
                 {loading ? "サインイン中..." : "ログイン"}
               </Button>
               {error ? <p className="text-sm text-destructive">{error}</p> : null}
             </form>
           </Form>
 
-          <p className="text-center text-xs text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground">
             アカウントをお持ちでない場合は
-            <Link href="/auth/signup" className="ml-1 underline">
+            <Link href="/auth/signup" className="ml-1 underline font-medium">
               新規登録
             </Link>
             へ。
