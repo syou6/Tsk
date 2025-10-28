@@ -29,7 +29,7 @@ export async function callGemini({
 const modelName = process.env.GEMINI_MODEL ?? "gemini-1.5-pro";
 const model = client.getGenerativeModel({
   model: modelName,
-  ...(systemPrompt ? { systemInstruction: systemPrompt } : {}),
+  ...(systemPrompt ? { systemInstruction: { role: "model", parts: [{ text: systemPrompt }] } } : {}),
 });
 
   const response = await model.generateContent({

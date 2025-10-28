@@ -41,7 +41,7 @@ export async function callReplicate({
     input.system_prompt = systemPrompt;
   }
 
-  const response = (await client.run(model, { input })) as unknown;
+  const response = (await client.run(model as `${string}/${string}`, { input })) as unknown;
 
   let content = "";
 

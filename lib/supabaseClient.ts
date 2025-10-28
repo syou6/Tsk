@@ -10,7 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn("Supabase client is not configured. NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are required.");
 }
 
-let browserClient: SupabaseClient | null = null;
+let browserClient: SupabaseClient<any, "public", "public", any, any> | null = null;
 
 export function getSupabaseBrowserClient() {
   if (!supabaseUrl || !supabaseAnonKey) {
@@ -18,7 +18,7 @@ export function getSupabaseBrowserClient() {
   }
 
   if (!browserClient) {
-    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
+    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey) as unknown as SupabaseClient<any, "public", "public", any, any>;
   }
 
   return browserClient;
