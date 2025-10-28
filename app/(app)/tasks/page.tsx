@@ -2,10 +2,9 @@ import { redirect } from "next/navigation";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Button } from "@/components/ui/button";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import { createTask } from "./actions";
 import { TaskBoard, type Task } from "./TaskBoard";
+import { TaskForm } from "./TaskForm";
 
 export const dynamic = "force-dynamic";
 
@@ -68,35 +67,10 @@ export default async function TasksPage() {
           <p className="mt-3 text-base text-muted-foreground md:text-xl">
             MVP ビルド・マーケ・サポートのタスクを登録し、緊急 / 重要フラグをセット。AI 分類を有効にすればブロッカー抽出や ROI 推定も自動化できます。
           </p>
-          <form action={createTask} className="mt-6 grid gap-4 md:grid-cols-[1fr,180px]">
-            <div className="space-y-2">
-              <label htmlFor="title" className="text-base font-semibold text-muted-foreground md:text-lg">
-                タスク名
-              </label>
-              <input
-                id="title"
-                name="title"
-                required
-                placeholder="例: Waitlist 向けオンボードメール改善"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none"
-              />
-              <div className="flex items-center gap-4 text-sm text-muted-foreground md:text-base">
-                <label className="inline-flex items-center gap-2">
-                  <input type="checkbox" name="urgent" className="h-4 w-4 rounded border-border" />
-                  緊急
-                </label>
-                <label className="inline-flex items-center gap-2">
-                  <input type="checkbox" name="important" className="h-4 w-4 rounded border-border" />
-                  重要
-                </label>
-              </div>
-            </div>
-            <div className="flex items-end justify-end">
-              <Button type="submit" className="w-full md:w-auto">
-                タスクを追加
-              </Button>
-            </div>
-          </form>
+          
+          <div className="mt-6">
+            <TaskForm />
+          </div>
         </section>
 
         <section className="space-y-6">
