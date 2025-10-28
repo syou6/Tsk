@@ -24,6 +24,7 @@ type TaskRow = {
   urgent: boolean;
   important: boolean;
   quadrant: Quadrant | null;
+  completed: boolean;
   created_at: string;
 };
 
@@ -115,7 +116,7 @@ export default function DashboardPage() {
     const fetchTasks = async () => {
       const { data, error } = await supabase
         .from("tasks")
-        .select("id,title,urgent,important,quadrant,created_at")
+        .select("id,title,urgent,important,quadrant,completed,created_at")
         .order("created_at", { ascending: false })
         .limit(20);
 

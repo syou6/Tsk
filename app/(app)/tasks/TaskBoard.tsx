@@ -13,6 +13,7 @@ export type Task = {
   urgent: boolean;
   important: boolean;
   quadrant: Quadrant | null;
+  completed: boolean;
   created_at: string;
 };
 
@@ -179,7 +180,7 @@ export function TaskBoard({ initialTasks }: TaskBoardProps) {
                               {...dragProvided.dragHandleProps}
                               className={`rounded-2xl border border-border bg-white/80 p-4 shadow-sm backdrop-blur transition ${
                                 dragSnapshot.isDragging ? "ring-2 ring-brand" : ""
-                              }`}
+                              } ${task.completed ? "opacity-60 bg-gray-50" : ""}`}
                             >
                               <div className="flex flex-col gap-2">
                                 <div className="flex items-start justify-between gap-3">
@@ -214,6 +215,18 @@ export function TaskBoard({ initialTasks }: TaskBoardProps) {
                                       disabled={isPending}
                                     >
                                       重要 {task.important ? "ON" : "OFF"}
+                                    </Button>
+                                  </form>
+                                  <form action={updateTask}>
+                                    <input type="hidden" name="id" value={task.id} />
+                                    <input type="hidden" name="completed" value={(!task.completed).toString()} />
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className={task.completed ? "border-green-300 bg-green-100 text-green-700" : ""}
+                                      disabled={isPending}
+                                    >
+                                      {task.completed ? "✓ 完了" : "○ 未完了"}
                                     </Button>
                                   </form>
                                   <form action={deleteTask}>

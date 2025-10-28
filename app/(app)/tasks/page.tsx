@@ -40,7 +40,7 @@ export default async function TasksPage() {
 
   const { data, error } = await supabase
     .from("tasks")
-    .select("id,title,urgent,important,quadrant,created_at")
+    .select("id,title,urgent,important,quadrant,completed,created_at")
     .order("created_at", { ascending: false });
 
   if (error) {

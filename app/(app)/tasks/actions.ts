@@ -85,6 +85,10 @@ export async function updateTask(formData: FormData) {
       updatePayload.important = parseBoolean(formData.get("important"));
     }
 
+    if (formData.has("completed")) {
+      updatePayload.completed = parseBoolean(formData.get("completed"));
+    }
+
     if (Object.keys(updatePayload).length === 0) {
       throw new Error("更新内容がありません");
     }
