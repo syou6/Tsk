@@ -60,7 +60,15 @@ export function classifyTask(title: string): ClassificationResult {
   
   // 最も高いスコアの象限を選択
   const maxScore = Math.max(...Object.values(scores));
-  const bestQuadrant = Object.entries(scores).find(([_, score]) => score === maxScore)?.[0] as Quadrant || "D";
+  let bestQuadrant: Quadrant;
+  
+  if (maxScore === 0) {
+    // キーワードが見つからない場合はD象限
+    bestQuadrant = "D";
+  } else {
+    // 最も高いスコアの象限を選択
+    bestQuadrant = Object.entries(scores).find(([_, score]) => score === maxScore)?.[0] as Quadrant || "D";
+  }
   
   // 信頼度を計算（0-100%）
   const totalKeywords = Object.values(scores).reduce((sum, score) => sum + score, 0);
