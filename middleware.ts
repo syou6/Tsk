@@ -31,8 +31,25 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
+  // 認証が必要なページのパス
+  const protectedPaths = ["/dashboard", "/tasks"];
+  const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path));
+
+  // ログイン済みユーザーがルートページにアクセスした場合、ダッシュボードにリダイレクト
   if (session && request.nextUrl.pathname === "/") {
     const redirectUrl = new URL("/dashboard", request.url);
+    const redirectResponse = NextResponse.redirect(redirectUrl);
+
+    response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie);
+    });
+
+    return redirectResponse;
+  }
+
+  // 認証が必要なページに未認証でアクセスした場合、ログインページにリダイレクト
+  if (!session && isProtectedPath) {
+    const redirectUrl = new URL("/auth/login", request.url);
     const redirectResponse = NextResponse.redirect(redirectUrl);
 
     response.cookies.getAll().forEach((cookie) => {

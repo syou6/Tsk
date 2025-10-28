@@ -91,24 +91,17 @@ export default function DashboardPage() {
       const { data } = await supabase.auth.getSession();
       const currentSession = data.session ?? null;
       setSession(currentSession);
-
-      if (!currentSession) {
-        setLoading(false);
-        router.replace("/auth/login");
-        return;
-      }
-
       setLoading(false);
-      toast.success("ようこそ、MVP モードへ！", { id: "welcome-toast" });
+      
+      if (currentSession) {
+        toast.success("ようこそ、MVP モードへ！", { id: "welcome-toast" });
+      }
     };
 
     void hydrateSession();
 
     const authListener = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
-      if (!newSession) {
-        router.replace("/auth/login");
-      }
     });
 
     return () => {
@@ -177,7 +170,11 @@ export default function DashboardPage() {
   }
 
   if (!session) {
-    return null;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+        <span className="text-sm text-slate-500">認証情報を確認中...</span>
+      </div>
+    );
   }
 
   return (
