@@ -37,6 +37,21 @@ export function TaskForm() {
     setIsAnalyzing(false);
   };
 
+  const handleAutoSubmit = async () => {
+    if (!title.trim()) return;
+
+    // AI分類を実行
+    await handleAIAnalysis();
+    
+    // 少し待ってから自動送信
+    setTimeout(() => {
+      const form = document.querySelector('form[action]') as HTMLFormElement;
+      if (form) {
+        form.requestSubmit();
+      }
+    }, 500);
+  };
+
   const quadrantLabels = {
     A: "A: Ship Now (緊急・重要)",
     B: "B: Validate / Grow (重要・非緊急)",
@@ -63,11 +78,11 @@ export function TaskForm() {
             />
             <Button
               type="button"
-              onClick={handleAIAnalysis}
+              onClick={handleAutoSubmit}
               disabled={!title.trim() || isAnalyzing}
               className="whitespace-nowrap"
             >
-              {isAnalyzing ? "🤖 分析中..." : "🤖 AI分類"}
+              {isAnalyzing ? "🤖 分析中..." : "🤖 AI分類して追加"}
             </Button>
           </div>
           
@@ -98,7 +113,7 @@ export function TaskForm() {
         </div>
         <div className="flex items-end justify-end">
           <Button type="submit" className="w-full md:w-auto">
-            タスクを追加
+            手動で追加
           </Button>
         </div>
       </form>
@@ -128,7 +143,8 @@ export function TaskForm() {
             </div>
 
             <div className="text-sm text-green-700">
-              ✅ 緊急・重要フラグが自動設定されました
+              ✅ 緊急・重要フラグが自動設定されました<br/>
+              🚀 タスクが自動で追加されます...
             </div>
           </div>
         </div>
