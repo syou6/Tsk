@@ -15,8 +15,7 @@ function AuthCallbackContent() {
       if (!supabase) return;
 
       try {
-        // URLパラメータから認証コードを取得
-        const code = searchParams.get('code');
+        // URLパラメータからエラーを確認
         const error = searchParams.get('error');
 
         if (error) {
@@ -26,43 +25,61 @@ function AuthCallbackContent() {
           return;
         }
 
-        if (code) {
-          // 認証コードをセッションに変換
-          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        // 認証状態の監視を設定
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+          console.log("Auth state change:", event, session ? "logged in" : "logged out");
           
-          if (exchangeError) {
-            console.error("Code exchange error:", exchangeError);
-            toast.error("認証コードの処理に失敗しました。");
-            router.push("/auth/login");
-            return;
-          }
-
-          if (data.session) {
+          if (event === 'SIGNED_IN' && session) {
             toast.success("ログインしました！");
             router.push("/dashboard");
-          } else {
-            toast.error("セッションの作成に失敗しました。");
+          } else if (event === 'SIGNED_OUT') {
+            toast.error("ログアウトしました。");
             router.push("/auth/login");
           }
-        } else {
-          // コードがない場合は既存のセッションを確認
-          const { data, error: sessionError } = await supabase.auth.getSession();
-          
-          if (sessionError) {
-            console.error("Session error:", sessionError);
-            toast.error("認証に失敗しました。");
-            router.push("/auth/login");
-            return;
-          }
+        });
 
-          if (data.session) {
-            toast.success("ログインしました！");
-            router.push("/dashboard");
-          } else {
-            toast.error("セッションが見つかりません。");
-            router.push("/auth/login");
-          }
+        // 既存のセッションを確認
+        const { data, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          toast.error("認証に失敗しました。");
+          router.push("/auth/login");
+          return;
         }
+
+        if (data.session) {
+          toast.success("ログインしました！");
+          router.push("/dashboard");
+        } else {
+          // セッションがない場合は少し待ってから再試行
+          setTimeout(async () => {
+            const { data: retryData, error: retryError } = await supabase.auth.getSession();
+            
+            if (retryError) {
+              console.error("Retry session error:", retryError);
+              toast.error("認証に失敗しました。");
+              router.push("/auth/login");
+              return;
+            }
+
+            if (retryData.session) {
+              toast.success("ログインしました！");
+              router.push("/dashboard");
+            } else {
+              // タイムアウト後にログインページにリダイレクト
+              setTimeout(() => {
+                toast.error("認証がタイムアウトしました。");
+                router.push("/auth/login");
+              }, 3000);
+            }
+          }, 1000);
+        }
+
+        // クリーンアップ
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error) {
         console.error("Auth callback error:", error);
         toast.error("認証処理中にエラーが発生しました。");
