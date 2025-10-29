@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import type { Session } from "@/lib/supabaseClient";
 
 export default function AppLayout({
@@ -17,6 +18,7 @@ export default function AppLayout({
   const router = useRouter();
   const supabase = getSupabaseBrowserClient();
   const [session, setSession] = useState<Session | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -28,17 +30,47 @@ export default function AppLayout({
 
     getSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Layout auth state change:", event, session ? "logged in" : "logged out");
       setSession(session);
+      
+      // ログアウト時はホームページにリダイレクト
+      if (event === 'SIGNED_OUT') {
+        router.push("/");
+      }
     });
 
     return () => subscription.unsubscribe();
   }, [supabase]);
 
   const handleSignOut = async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
-    router.push("/");
+    if (!supabase || isSigningOut) return;
+    
+    setIsSigningOut(true);
+    
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Sign out error:", error);
+        toast.error("ログアウトに失敗しました。");
+        setIsSigningOut(false);
+        return;
+      }
+      
+      // セッションをクリア
+      setSession(null);
+      
+      // 成功メッセージを表示
+      toast.success("ログアウトしました。");
+      
+      // ホームページにリダイレクト
+      router.push("/");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("ログアウト中にエラーが発生しました。");
+      setIsSigningOut(false);
+    }
   };
 
   const navItems = [
@@ -90,9 +122,10 @@ export default function AppLayout({
                     variant="outline"
                     size="sm"
                     onClick={handleSignOut}
+                    disabled={isSigningOut}
                     className="text-slate-600 hover:text-slate-900"
                   >
-                    ログアウト
+                    {isSigningOut ? "ログアウト中..." : "ログアウト"}
                   </Button>
                 </div>
               )}
