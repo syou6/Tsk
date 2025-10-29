@@ -6,40 +6,42 @@ interface ClassificationResult {
   reasoning: string;
 }
 
-// インディハッカー向けキーワード分類
-const classificationKeywords = {
+// インディハッカー向け高度分類ロジック
+const classificationPatterns = {
   A: {
-    keywords: [
-      "バグ", "エラー", "修正", "緊急", "ブロッカー", "動かない", "壊れた",
-      "デプロイ", "本番", "サーバー", "ダウン", "ログイン", "認証",
-      "決済", "支払い", "課金", "セキュリティ", "脆弱性", "ハッキング"
-    ],
+    // 緊急度の高いキーワード（重み: 3）
+    urgent: ["バグ", "エラー", "修正", "緊急", "ブロッカー", "動かない", "壊れた", "ダウン", "落ちる", "止まる"],
+    // 重要度の高いキーワード（重み: 3）
+    important: ["本番", "デプロイ", "サーバー", "ログイン", "認証", "決済", "支払い", "課金", "セキュリティ", "脆弱性"],
+    // ビジネス影響（重み: 2）
+    business: ["売上", "収益", "顧客", "ユーザー", "サービス", "アプリ"],
     description: "ローンチを止める致命的なブロッカー"
   },
   B: {
-    keywords: [
-      "機能", "新機能", "追加", "改善", "最適化", "パフォーマンス",
-      "ユーザー", "体験", "UI", "UX", "デザイン", "マーケティング",
-      "分析", "データ", "統計", "A/B", "テスト", "検証", "仮説",
-      "収益", "売上", "コンバージョン", "リテンション", "成長"
-    ],
+    // 成長・改善キーワード（重み: 2）
+    growth: ["機能", "新機能", "追加", "改善", "最適化", "パフォーマンス", "体験", "UI", "UX", "デザイン"],
+    // マーケティング・分析（重み: 2）
+    marketing: ["マーケティング", "分析", "データ", "統計", "A/B", "テスト", "検証", "仮説", "コンバージョン", "リテンション"],
+    // 戦略的キーワード（重み: 1）
+    strategic: ["戦略", "計画", "ロードマップ", "目標", "KPI", "指標"],
     description: "ROIの高い検証・グロース施策"
   },
   C: {
-    keywords: [
-      "ドキュメント", "README", "コメント", "整理", "リファクタ",
-      "設定", "環境", "セットアップ", "インストール", "依存関係",
-      "メール", "通知", "アラート", "ログ", "監視", "バックアップ",
-      "テスト", "単体テスト", "結合テスト", "E2E", "CI/CD"
-    ],
+    // 運用・保守キーワード（重み: 2）
+    ops: ["ドキュメント", "README", "コメント", "整理", "リファクタ", "設定", "環境", "セットアップ"],
+    // 自動化・効率化（重み: 2）
+    automation: ["自動化", "CI/CD", "デプロイ", "テスト", "単体テスト", "結合テスト", "E2E"],
+    // 管理・監視（重み: 1）
+    management: ["メール", "通知", "アラート", "ログ", "監視", "バックアップ", "メンテナンス"],
     description: "任せられるOps・自動化候補"
   },
   D: {
-    keywords: [
-      "アイデア", "検討", "調査", "研究", "実験", "プロトタイプ",
-      "将来", "後で", "いつか", "余裕", "時間", "暇",
-      "趣味", "学習", "勉強", "練習", "試行錯誤"
-    ],
+    // 低優先度キーワード（重み: 1）
+    lowPriority: ["アイデア", "検討", "調査", "研究", "実験", "プロトタイプ", "将来", "後で", "いつか"],
+    // 個人的・学習（重み: 1）
+    personal: ["趣味", "学習", "勉強", "練習", "試行錯誤", "遊び", "実験的"],
+    // 非業務キーワード（重み: 2）
+    nonBusiness: ["歯磨き", "睡眠", "食事", "おやつ", "休憩", "散歩", "運動"],
     description: "影響が小さいタスク・バックログ"
   }
 };
@@ -47,16 +49,77 @@ const classificationKeywords = {
 export function classifyTask(title: string): ClassificationResult {
   const lowerTitle = title.toLowerCase();
   
-  // 各象限のスコアを計算
+  // 各象限のスコアを計算（重み付き）
   const scores: Record<Quadrant, number> = { A: 0, B: 0, C: 0, D: 0 };
   
-  for (const [quadrant, config] of Object.entries(classificationKeywords)) {
-    for (const keyword of config.keywords) {
+  for (const [quadrant, patterns] of Object.entries(classificationPatterns)) {
+    const quadrantKey = quadrant as Quadrant;
+    
+    // 緊急度チェック（重み: 3）
+    for (const keyword of patterns.urgent || []) {
       if (lowerTitle.includes(keyword.toLowerCase())) {
-        scores[quadrant as Quadrant] += 1;
+        scores[quadrantKey] += 3;
+      }
+    }
+    
+    // 重要度チェック（重み: 3）
+    for (const keyword of patterns.important || []) {
+      if (lowerTitle.includes(keyword.toLowerCase())) {
+        scores[quadrantKey] += 3;
+      }
+    }
+    
+    // ビジネス影響チェック（重み: 2）
+    for (const keyword of patterns.business || []) {
+      if (lowerTitle.includes(keyword.toLowerCase())) {
+        scores[quadrantKey] += 2;
+      }
+    }
+    
+    // 成長・改善チェック（重み: 2）
+    for (const keyword of patterns.growth || []) {
+      if (lowerTitle.includes(keyword.toLowerCase())) {
+        scores[quadrantKey] += 2;
+      }
+    }
+    
+    // マーケティング・分析チェック（重み: 2）
+    for (const keyword of patterns.marketing || []) {
+      if (lowerTitle.includes(keyword.toLowerCase())) {
+        scores[quadrantKey] += 2;
+      }
+    }
+    
+    // 運用・保守チェック（重み: 2）
+    for (const keyword of patterns.ops || []) {
+      if (lowerTitle.includes(keyword.toLowerCase())) {
+        scores[quadrantKey] += 2;
+      }
+    }
+    
+    // 自動化チェック（重み: 2）
+    for (const keyword of patterns.automation || []) {
+      if (lowerTitle.includes(keyword.toLowerCase())) {
+        scores[quadrantKey] += 2;
+      }
+    }
+    
+    // 非業務キーワードチェック（重み: 2）
+    for (const keyword of patterns.nonBusiness || []) {
+      if (lowerTitle.includes(keyword.toLowerCase())) {
+        scores[quadrantKey] += 2;
+      }
+    }
+    
+    // その他のキーワード（重み: 1）
+    for (const keyword of patterns.strategic || patterns.management || patterns.lowPriority || patterns.personal || []) {
+      if (lowerTitle.includes(keyword.toLowerCase())) {
+        scores[quadrantKey] += 1;
       }
     }
   }
+  
+  console.log("Advanced scores for", title, ":", scores);
   
   // 最も高いスコアの象限を選択
   const maxScore = Math.max(...Object.values(scores));
@@ -67,15 +130,18 @@ export function classifyTask(title: string): ClassificationResult {
     bestQuadrant = "D";
   } else {
     // 最も高いスコアの象限を選択
-    bestQuadrant = Object.entries(scores).find(([_, score]) => score === maxScore)?.[0] as Quadrant || "D";
+    const entries = Object.entries(scores) as [Quadrant, number][];
+    bestQuadrant = entries.find(([_, score]) => score === maxScore)?.[0] || "D";
   }
   
+  console.log("Max score:", maxScore, "Best quadrant:", bestQuadrant);
+  
   // 信頼度を計算（0-100%）
-  const totalKeywords = Object.values(scores).reduce((sum, score) => sum + score, 0);
-  const confidence = totalKeywords > 0 ? Math.min(95, (maxScore / totalKeywords) * 100) : 30;
+  const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+  const confidence = totalScore > 0 ? Math.min(95, (maxScore / totalScore) * 100) : 30;
   
   // 推論理由を生成
-  const reasoning = generateReasoning(bestQuadrant, scores, title);
+  const reasoning = generateAdvancedReasoning(bestQuadrant, scores, title);
   
   return {
     quadrant: bestQuadrant,
@@ -84,23 +150,48 @@ export function classifyTask(title: string): ClassificationResult {
   };
 }
 
-function generateReasoning(quadrant: Quadrant, scores: Record<Quadrant, number>, title: string): string {
-  const config = classificationKeywords[quadrant];
+function generateAdvancedReasoning(quadrant: Quadrant, scores: Record<Quadrant, number>, title: string): string {
+  const patterns = classificationPatterns[quadrant];
   const maxScore = scores[quadrant];
   
   if (maxScore === 0) {
     return `「${title}」は明確な分類キーワードが見つからないため、D象限（影響が小さいタスク・バックログ）に分類しました。`;
   }
   
-  const matchedKeywords = Object.entries(classificationKeywords[quadrant].keywords)
-    .filter(([_, keyword]) => title.toLowerCase().includes(keyword.toLowerCase()))
-    .map(([_, keyword]) => keyword);
+  // マッチしたキーワードを収集
+  const matchedKeywords: string[] = [];
+  const lowerTitle = title.toLowerCase();
   
-  if (matchedKeywords.length > 0) {
-    return `「${matchedKeywords.join("、")}」のキーワードから、${config.description}として${quadrant}象限に分類しました。`;
+  // 各カテゴリからマッチしたキーワードを収集
+  const categories = [
+    { keywords: patterns.urgent || [], weight: 3, name: "緊急度" },
+    { keywords: patterns.important || [], weight: 3, name: "重要度" },
+    { keywords: patterns.business || [], weight: 2, name: "ビジネス影響" },
+    { keywords: patterns.growth || [], weight: 2, name: "成長・改善" },
+    { keywords: patterns.marketing || [], weight: 2, name: "マーケティング" },
+    { keywords: patterns.ops || [], weight: 2, name: "運用・保守" },
+    { keywords: patterns.automation || [], weight: 2, name: "自動化" },
+    { keywords: patterns.nonBusiness || [], weight: 2, name: "非業務" },
+    { keywords: patterns.strategic || [], weight: 1, name: "戦略" },
+    { keywords: patterns.management || [], weight: 1, name: "管理" },
+    { keywords: patterns.lowPriority || [], weight: 1, name: "低優先度" },
+    { keywords: patterns.personal || [], weight: 1, name: "個人的" }
+  ];
+  
+  for (const category of categories) {
+    for (const keyword of category.keywords) {
+      if (lowerTitle.includes(keyword.toLowerCase())) {
+        matchedKeywords.push(keyword);
+      }
+    }
   }
   
-  return `AI分析により${config.description}として${quadrant}象限に分類しました。`;
+  if (matchedKeywords.length > 0) {
+    const topKeywords = matchedKeywords.slice(0, 3).join("、");
+    return `「${topKeywords}」のキーワードから、${patterns.description}として${quadrant}象限に分類しました。`;
+  }
+  
+  return `AI分析により${patterns.description}として${quadrant}象限に分類しました。`;
 }
 
 // AIっぽいローディングメッセージ
