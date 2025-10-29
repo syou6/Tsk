@@ -25,12 +25,14 @@ function AuthCallbackContent() {
           return;
         }
 
-        // 認証状態の監視を設定
+        // 認証状態の監視を設定（重複を防ぐため一度だけ）
+        let hasRedirected = false;
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           console.log("Auth state change:", event, session ? "logged in" : "logged out");
           
-          if (event === 'SIGNED_IN' && session) {
-            toast.success("ログインしました！");
+          if (event === 'SIGNED_IN' && session && !hasRedirected) {
+            hasRedirected = true;
+            toast.success("ログインしました！", { id: "login-success" });
             router.push("/dashboard");
           } else if (event === 'SIGNED_OUT') {
             toast.error("ログアウトしました。");
@@ -48,10 +50,11 @@ function AuthCallbackContent() {
           return;
         }
 
-        if (data.session) {
-          toast.success("ログインしました！");
+        if (data.session && !hasRedirected) {
+          hasRedirected = true;
+          toast.success("ログインしました！", { id: "login-success" });
           router.push("/dashboard");
-        } else {
+        } else if (!data.session) {
           // セッションがない場合は少し待ってから再試行
           setTimeout(async () => {
             const { data: retryData, error: retryError } = await supabase.auth.getSession();
@@ -63,10 +66,11 @@ function AuthCallbackContent() {
               return;
             }
 
-            if (retryData.session) {
-              toast.success("ログインしました！");
+            if (retryData.session && !hasRedirected) {
+              hasRedirected = true;
+              toast.success("ログインしました！", { id: "login-success" });
               router.push("/dashboard");
-            } else {
+            } else if (!retryData.session) {
               // タイムアウト後にログインページにリダイレクト
               setTimeout(() => {
                 toast.error("認証がタイムアウトしました。");

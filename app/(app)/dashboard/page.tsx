@@ -100,6 +100,7 @@ export default function DashboardPage() {
         setLoading(false);
         
         if (currentSession) {
+          // ウェルカムメッセージは一度だけ表示
           toast.success("ようこそ、MVP モードへ！", { id: "welcome-toast" });
         } else {
           // セッションがない場合はログインページにリダイレクト
@@ -121,6 +122,7 @@ export default function DashboardPage() {
       if (event === "SIGNED_OUT" || !newSession) {
         router.push("/auth/login");
       }
+      // ログイン成功時のメッセージはコールバックページで処理するため、ここでは表示しない
     });
 
     return () => {
