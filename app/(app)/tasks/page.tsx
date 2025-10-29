@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation";
 
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { TaskBoard, type Task } from "./TaskBoard";
 import { TaskForm } from "./TaskForm";
@@ -16,15 +14,11 @@ export default async function TasksPage() {
   } catch (error) {
     console.error("[tasks] Supabase client init failed", error);
     return (
-      <div className="flex min-h-screen flex-col bg-slate-100">
-        <Header />
-        <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-4 px-6 py-16 text-center">
-          <h1 className="text-2xl font-semibold text-slate-900">Supabase の設定が見つかりません</h1>
-          <p className="text-sm text-slate-600">
-            `.env.local` に `NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` を設定して、ページを再読み込みしてください。
-          </p>
-        </main>
-        <Footer />
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 text-center">
+        <h1 className="text-2xl font-semibold text-slate-900">Supabase の設定が見つかりません</h1>
+        <p className="text-sm text-slate-600">
+          `.env.local` に `NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` を設定して、ページを再読み込みしてください。
+        </p>
       </div>
     );
   }
@@ -49,9 +43,7 @@ export default async function TasksPage() {
   const tasks: Task[] = Array.isArray(data) ? (data as Task[]) : [];
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
-      <Header />
-      <main className="section-shell flex-1 space-y-10 py-12">
+    <div className="space-y-8">
         <div className="space-y-4 text-center">
           <span className="rounded-full border border-border px-4 py-1 text-sm font-semibold uppercase tracking-[0.3em] text-muted-foreground">
             Indie Hacker Sprint
@@ -83,8 +75,6 @@ export default async function TasksPage() {
 
           <TaskBoard initialTasks={tasks} />
         </section>
-      </main>
-      <Footer />
     </div>
   );
 }

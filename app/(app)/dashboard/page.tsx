@@ -5,8 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { AiPlayground } from "@/components/AiPlayground";
 import { getSupabaseBrowserClient, type Session } from "@/lib/supabaseClient";
@@ -169,22 +167,18 @@ export default function DashboardPage() {
 
   if (!supabase) {
     return (
-      <div className="flex min-h-screen flex-col bg-slate-100">
-        <Header />
-        <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-4 px-6 py-16 text-center">
-          <h1 className="text-2xl font-semibold text-slate-900">Supabase の接続情報が見つかりません</h1>
-          <p className="text-sm text-slate-600">
-            `.env.local` に `NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` を設定したあと、開発サーバーを再起動してください。
-          </p>
-        </main>
-        <Footer />
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 text-center">
+        <h1 className="text-2xl font-semibold text-slate-900">Supabase の接続情報が見つかりません</h1>
+        <p className="text-sm text-slate-600">
+          `.env.local` に `NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` を設定したあと、開発サーバーを再起動してください。
+        </p>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+      <div className="flex min-h-screen items-center justify-center">
         <span className="text-sm text-slate-500">ダッシュボードを読み込んでいます...</span>
       </div>
     );
@@ -192,16 +186,14 @@ export default function DashboardPage() {
 
   if (!session) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+      <div className="flex min-h-screen items-center justify-center">
         <span className="text-sm text-slate-500">認証情報を確認中...</span>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-100">
-      <Header />
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-12 px-6 py-12">
+    <div className="space-y-8">
         <section className="space-y-5">
           <div className="space-y-3">
             <span className="rounded-full border border-border px-4 py-1 text-sm font-semibold uppercase tracking-[0.3em] text-muted-foreground">
@@ -298,8 +290,6 @@ export default function DashboardPage() {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
     </div>
   );
 }
