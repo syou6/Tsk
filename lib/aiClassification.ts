@@ -7,7 +7,21 @@ interface ClassificationResult {
 }
 
 // インディハッカー向け高度分類ロジック
-const classificationPatterns = {
+const classificationPatterns: Record<Quadrant, {
+  urgent?: string[];
+  important?: string[];
+  business?: string[];
+  growth?: string[];
+  marketing?: string[];
+  strategic?: string[];
+  ops?: string[];
+  automation?: string[];
+  management?: string[];
+  lowPriority?: string[];
+  personal?: string[];
+  nonBusiness?: string[];
+  description: string;
+}> = {
   A: {
     // 緊急度の高いキーワード（重み: 3）
     urgent: ["バグ", "エラー", "修正", "緊急", "ブロッカー", "動かない", "壊れた", "ダウン", "落ちる", "止まる"],
