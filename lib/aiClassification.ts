@@ -24,38 +24,74 @@ const classificationPatterns: Record<Quadrant, {
 }> = {
   A: {
     // 緊急度の高いキーワード（重み: 3）
-    urgent: ["バグ", "エラー", "修正", "緊急", "ブロッカー", "動かない", "壊れた", "ダウン", "落ちる", "止まる"],
+    urgent: [
+      "バグ", "エラー", "修正", "緊急", "ブロッカー", "動かない", "壊れた", "ダウン", "落ちる", "止まる",
+      "bug", "error", "fix", "urgent", "blocker", "broken", "down", "crash", "stop", "critical"
+    ],
     // 重要度の高いキーワード（重み: 3）
-    important: ["本番", "デプロイ", "サーバー", "ログイン", "認証", "決済", "支払い", "課金", "セキュリティ", "脆弱性"],
+    important: [
+      "本番", "デプロイ", "サーバー", "ログイン", "認証", "決済", "支払い", "課金", "セキュリティ", "脆弱性",
+      "production", "deploy", "server", "login", "auth", "payment", "billing", "security", "vulnerability"
+    ],
     // ビジネス影響（重み: 2）
-    business: ["売上", "収益", "顧客", "ユーザー", "サービス", "アプリ"],
+    business: [
+      "売上", "収益", "顧客", "ユーザー", "サービス", "アプリ",
+      "revenue", "sales", "customer", "user", "service", "app", "business"
+    ],
     description: "ローンチを止める致命的なブロッカー"
   },
   B: {
     // 成長・改善キーワード（重み: 2）
-    growth: ["機能", "新機能", "追加", "改善", "最適化", "パフォーマンス", "体験", "UI", "UX", "デザイン"],
+    growth: [
+      "機能", "新機能", "追加", "改善", "最適化", "パフォーマンス", "体験", "UI", "UX", "デザイン",
+      "feature", "new feature", "add", "improve", "optimize", "performance", "experience", "design"
+    ],
     // マーケティング・分析（重み: 2）
-    marketing: ["マーケティング", "分析", "データ", "統計", "A/B", "テスト", "検証", "仮説", "コンバージョン", "リテンション"],
+    marketing: [
+      "マーケティング", "分析", "データ", "統計", "A/B", "テスト", "検証", "仮説", "コンバージョン", "リテンション",
+      "marketing", "analytics", "data", "statistics", "ab test", "test", "validation", "hypothesis", "conversion", "retention"
+    ],
     // 戦略的キーワード（重み: 1）
-    strategic: ["戦略", "計画", "ロードマップ", "目標", "KPI", "指標"],
+    strategic: [
+      "戦略", "計画", "ロードマップ", "目標", "KPI", "指標",
+      "strategy", "plan", "roadmap", "goal", "kpi", "metric"
+    ],
     description: "ROIの高い検証・グロース施策"
   },
   C: {
     // 運用・保守キーワード（重み: 2）
-    ops: ["ドキュメント", "README", "コメント", "整理", "リファクタ", "設定", "環境", "セットアップ"],
+    ops: [
+      "ドキュメント", "README", "コメント", "整理", "リファクタ", "設定", "環境", "セットアップ",
+      "documentation", "readme", "comment", "refactor", "setup", "config", "environment"
+    ],
     // 自動化・効率化（重み: 2）
-    automation: ["自動化", "CI/CD", "デプロイ", "テスト", "単体テスト", "結合テスト", "E2E"],
+    automation: [
+      "自動化", "CI/CD", "デプロイ", "テスト", "単体テスト", "結合テスト", "E2E",
+      "automation", "cicd", "deploy", "test", "unit test", "integration test", "e2e"
+    ],
     // 管理・監視（重み: 1）
-    management: ["メール", "通知", "アラート", "ログ", "監視", "バックアップ", "メンテナンス"],
+    management: [
+      "メール", "通知", "アラート", "ログ", "監視", "バックアップ", "メンテナンス",
+      "email", "notification", "alert", "log", "monitor", "backup", "maintenance"
+    ],
     description: "任せられるOps・自動化候補"
   },
   D: {
     // 低優先度キーワード（重み: 1）
-    lowPriority: ["アイデア", "検討", "調査", "研究", "実験", "プロトタイプ", "将来", "後で", "いつか"],
+    lowPriority: [
+      "アイデア", "検討", "調査", "研究", "実験", "プロトタイプ", "将来", "後で", "いつか",
+      "idea", "consider", "research", "experiment", "prototype", "future", "later", "someday"
+    ],
     // 個人的・学習（重み: 1）
-    personal: ["趣味", "学習", "勉強", "練習", "試行錯誤", "遊び", "実験的"],
+    personal: [
+      "趣味", "学習", "勉強", "練習", "試行錯誤", "遊び", "実験的",
+      "hobby", "learning", "study", "practice", "trial", "play", "experimental"
+    ],
     // 非業務キーワード（重み: 2）
-    nonBusiness: ["歯磨き", "睡眠", "食事", "おやつ", "休憩", "散歩", "運動"],
+    nonBusiness: [
+      "歯磨き", "睡眠", "食事", "おやつ", "休憩", "散歩", "運動",
+      "brush teeth", "sleep", "eat", "snack", "break", "walk", "exercise", "personal"
+    ],
     description: "影響が小さいタスク・バックログ"
   }
 };
