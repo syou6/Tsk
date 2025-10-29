@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import toast from "react-hot-toast";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = getSupabaseBrowserClient();
 
   useEffect(() => {
@@ -14,21 +15,53 @@ export default function AuthCallbackPage() {
       if (!supabase) return;
 
       try {
-        const { data, error } = await supabase.auth.getSession();
-        
+        // URLパラメータから認証コードを取得
+        const code = searchParams.get('code');
+        const error = searchParams.get('error');
+
         if (error) {
-          console.error("Auth callback error:", error);
+          console.error("OAuth error:", error);
           toast.error("認証に失敗しました。再度お試しください。");
           router.push("/auth/login");
           return;
         }
 
-        if (data.session) {
-          toast.success("ログインしました！");
-          router.push("/dashboard");
+        if (code) {
+          // 認証コードをセッションに変換
+          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          
+          if (exchangeError) {
+            console.error("Code exchange error:", exchangeError);
+            toast.error("認証コードの処理に失敗しました。");
+            router.push("/auth/login");
+            return;
+          }
+
+          if (data.session) {
+            toast.success("ログインしました！");
+            router.push("/dashboard");
+          } else {
+            toast.error("セッションの作成に失敗しました。");
+            router.push("/auth/login");
+          }
         } else {
-          toast.error("セッションが見つかりません。");
-          router.push("/auth/login");
+          // コードがない場合は既存のセッションを確認
+          const { data, error: sessionError } = await supabase.auth.getSession();
+          
+          if (sessionError) {
+            console.error("Session error:", sessionError);
+            toast.error("認証に失敗しました。");
+            router.push("/auth/login");
+            return;
+          }
+
+          if (data.session) {
+            toast.success("ログインしました！");
+            router.push("/dashboard");
+          } else {
+            toast.error("セッションが見つかりません。");
+            router.push("/auth/login");
+          }
         }
       } catch (error) {
         console.error("Auth callback error:", error);
@@ -38,7 +71,7 @@ export default function AuthCallbackPage() {
     };
 
     handleAuthCallback();
-  }, [supabase, router]);
+  }, [supabase, router, searchParams]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
