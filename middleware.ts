@@ -59,6 +59,7 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
+
   return response;
 }
 

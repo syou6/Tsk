@@ -89,20 +89,40 @@ export default function DashboardPage() {
     }
 
     const hydrateSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      const currentSession = data.session ?? null;
-      setSession(currentSession);
-      setLoading(false);
-      
-      if (currentSession) {
-        toast.success("ようこそ、MVP モードへ！", { id: "welcome-toast" });
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Session error:", error);
+          setLoading(false);
+          return;
+        }
+        
+        const currentSession = data.session ?? null;
+        setSession(currentSession);
+        setLoading(false);
+        
+        if (currentSession) {
+          toast.success("ようこそ、MVP モードへ！", { id: "welcome-toast" });
+        } else {
+          // セッションがない場合はログインページにリダイレクト
+          router.push("/auth/login");
+        }
+      } catch (error) {
+        console.error("Session hydration error:", error);
+        setLoading(false);
+        router.push("/auth/login");
       }
     };
 
     void hydrateSession();
 
-    const authListener = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const authListener = supabase.auth.onAuthStateChange((event, newSession) => {
+      console.log("Auth state changed:", event, newSession ? "logged in" : "logged out");
       setSession(newSession);
+      
+      if (event === "SIGNED_OUT" || !newSession) {
+        router.push("/auth/login");
+      }
     });
 
     return () => {
@@ -194,7 +214,10 @@ export default function DashboardPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Button asChild>
-              <Link href="/tasks">タスクボードを開く</Link>
+              <Link href="/tasks">📊 マトリクスを開く</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/tasks">📝 タスク管理</Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href="/">プロダクト概要を見る</Link>
@@ -207,11 +230,12 @@ export default function DashboardPage() {
             const meta = quadrantMeta[quadrant];
             const count = summary[quadrant];
             return (
-              <div key={quadrant} className={`rounded-3xl border p-6 shadow-sm ${meta.accent}`}>
+              <Link key={quadrant} href="/tasks" className={`rounded-3xl border p-6 shadow-sm transition-all hover:shadow-md ${meta.accent}`}>
                 <h3 className="text-base font-semibold md:text-xl">{meta.title}</h3>
                 <p className="mt-2 text-xs opacity-80 md:text-sm">{meta.hint}</p>
                 <p className="mt-6 text-3xl font-bold md:text-4xl">{count}</p>
-              </div>
+                <p className="mt-2 text-xs opacity-60">クリックして詳細を見る</p>
+              </Link>
             );
           })}
         </section>
